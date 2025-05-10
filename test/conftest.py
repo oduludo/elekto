@@ -2,8 +2,6 @@ import os
 
 import pytest
 
-from test.factories import ElectionFactory, BallotFactory
-
 # Inject required environment variables
 # TODO: make this nicer; this injection must happen before the APP and SESSION imports (or any other imports that
 #  trigger APP and SESSION).
