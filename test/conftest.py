@@ -2,10 +2,14 @@ import os
 
 import pytest
 
+from test.factories import ElectionFactory, BallotFactory
+
+# Inject required environment variables
+# TODO: make this nicer; this injection must happen before the APP and SESSION imports
+os.environ['DB_CONNECTION'] = 'sqlite'
+
 from elekto import APP, SESSION
 from elekto.models.sql import drop_all, migrate
-
-from test.factories import ElectionFactory, BallotFactory
 
 
 @pytest.fixture(scope="module", autouse=True)
