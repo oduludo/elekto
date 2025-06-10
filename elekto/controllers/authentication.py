@@ -79,7 +79,11 @@ github = APP.config.get('GITHUB')
 def oauth_github_login():
     client = oauth_session(github)
     uri, state = client.create_authorization_url(
-        constants.GITHUB_AUTHORIZE)
+        'http://localhost:8080/default/authorize',
+        # constants.GITHUB_AUTHORIZE
+        redirect_uri='http://localhost:8000/oauth/github/callback'
+    )
+    print(f'OAuth Github authorization URL: {uri}')
     F.session[constants.CSRF_STATE] = state  # Enable CSRF protection
     # Set the redirect url
     if 'r' in F.request.args.keys():
@@ -90,16 +94,22 @@ def oauth_github_login():
     return F.redirect(uri)
 
 
+# /oauth/github/callback
 @APP.route(github['redirect'])
 @csrf_guard
 def oauth_github_redirect():
+    print(f'method: {F.request.method}')
     client = oauth_session(github)
-    token = client.fetch_token(constants.GITHUB_ACCESS,
+    token = client.fetch_token('http://localhost:8080/default/token',
+        #constants.GITHUB_ACCESS,
                                authorization_response=F.request.url)
     oauthsession = OAuth2Session(client_id=github['client_id'],
                                  client_secret=github['client_secret'],
                                  token=token)
-    resp = oauthsession.get(constants.GITHUB_PROFILE)
+    resp = oauthsession.get(
+        'http://localhost:8080/default/userinfo'
+        # constants.GITHUB_PROFILE
+    )
     if resp.status_code != 200:
         F.g.user = None
         F.g.auth = False
@@ -111,15 +121,18 @@ def oauth_github_redirect():
             F.session.pop(constants.AUTH_STATE)
     else:
         data = resp.json()
+        print(data)
         expries = datetime.now() + timedelta(days=1)
         query = SESSION.query(User).filter_by(username=data['login']).first()
         if query:
+            print('RECOGNIZED EXISTING USER')
             query.token = token['access_token']
             query.token_expires_at = expries
         else:
+            print('CREATE NEW USER')
             SESSION.add(User(username=data['login'],
                              name=data['name'],
-                             token=token['access_token'],
+                             token=token['access_token'],  # WARNING: Our original DB schema has a maximum token length of 255 chars, but the mock server goes well beyond that (e.g., 733 chars).
                              token_expires_at=expries))
         SESSION.commit()
         # Add user's authentication token to the flask session
