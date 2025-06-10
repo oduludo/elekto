@@ -10,6 +10,20 @@ services:
       - pgdata:/var/lib/postgresql/data
     ports:
       - '5432:5432'
+  oauth:
+    image: ghcr.io/navikt/mock-oauth2-server:2.2.1
+    environment:
+      JSON_CONFIG: |
+        {
+          "interactiveLogin": true,
+          "tokenProvider" : {
+            "keyProvider" : {
+              "algorithm" : "ES256"
+            }
+          }
+        }
+    ports:
+      - '8080:8080'
 
 volumes:
   pgdata:

@@ -115,3 +115,17 @@ See the website at [Elekto.dev](https://elekto.dev).
 
 Elekto is a project of the CNCF, and you can reach us on [CNCF Slack](https://slack.cncf.io/),
 channel #elekto.
+
+### Working with the Oauth mock server
+The mockserver allows custom JSON data to be entered when authorizing. It's important this data is similar to what
+GitHub would return in reality. Use the following structure:
+```json
+{
+  "login": "johndoe",
+  "name": "John Doe"
+}
+```
+
+Sticking to this structure allows Elekto's callback endpoint to process the data and search cq create a user. This input
+at the moment is case-sensitive: `"login": "johndoe"` and `"login": "Johndoe"` result in two different users when 
+entered.

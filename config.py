@@ -102,7 +102,7 @@ GITHUB = {
     'client_id': env('GITHUB_CLIENT_ID'),
     'client_secret': env('GITHUB_CLIENT_SECRET'),
     'redirect': env('GITHUB_REDIRECT', '/oauth/github/callback'),
-    'scope': 'user:login,name',
+    'scope': 'openid', #'user:login,name',  # WARNING: The Oauth mock server does not like any non-openid scopes. `user:login,name` won't be accepted.
 }
 
 PASSCODE_LENGTH = env('MIN_PASSCODE_LENGTH', 6)
