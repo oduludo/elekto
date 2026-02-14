@@ -26,9 +26,18 @@ services:
       - "8000:8000"
     environment:
       DB_CONNECTION: postgresql
+      DB_HOST: db
       DB_PORT: 5432
+      DB_PASSWORD: root
+      DB_DATABASE: elekto
       INTEGRATION_TEST: true
       APP_PORT: 8000
+      META_REPO: https://github.com/elekto-dev/elekto.meta.test.git
+      ELECTION_DIR: elections
+      META_DEPLOYMENT: local
+      META_PATH: meta
+      META_BRANCH: main
+      META_SECRET: xxx
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://0.0.0.0:8000/app/" ]
       interval: 10s
